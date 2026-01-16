@@ -21,7 +21,7 @@ const db = getFirestore(app);
 
 // Form validation helper
 function validateForm() {
-    const requiredFields = ['name', 'phone', 'email', 'location', 'leadSource', 'whyWantToJoin'];
+    const requiredFields = ['name', 'phone', 'email', 'age', 'location', 'leadSource', 'whyWantToJoin'];
     const errors = [];
 
     requiredFields.forEach(fieldId => {
@@ -60,9 +60,9 @@ function validateForm() {
 }
 
 // Form submission handler
-window.submitJoinForm = async function(event) {
+window.submitJoinForm = async function (event) {
     event.preventDefault();
-    
+
     // Show loading state
     showLoading(true);
     showMessage('', true); // Clear previous messages
@@ -79,6 +79,7 @@ window.submitJoinForm = async function(event) {
     const name = document.getElementById('name').value.trim();
     const phone = document.getElementById('phone').value.trim();
     const email = document.getElementById('email').value.trim();
+    const age = document.getElementById('age').value.trim();
     const instagramId = document.getElementById('instagramId').value.trim();
     const location = document.getElementById('location').value.trim();
     const leadSource = document.getElementById('leadSource').value;
@@ -98,6 +99,7 @@ window.submitJoinForm = async function(event) {
             name: name,
             phone: phone,
             email: email,
+            age: parseInt(age) || null,
             instagramId: instagramId,
             location: location,
             leadSource: finalLeadSource,
@@ -109,13 +111,13 @@ window.submitJoinForm = async function(event) {
         // Success handling
         showLoading(false);
         showMessage('🎉 Your request has been submitted successfully! We\'ll get back to you soon.', true);
-        
+
         // Reset form after a short delay
         setTimeout(() => {
             document.getElementById('joinForm').reset();
             document.getElementById('otherFieldContainer').classList.add('hidden');
             document.getElementById('leadSourceOther').required = false;
-            
+
             // Clear message after form reset
             setTimeout(() => {
                 showMessage('', true);
@@ -125,7 +127,7 @@ window.submitJoinForm = async function(event) {
     } catch (error) {
         console.error("Error writing document: ", error);
         showLoading(false);
-        
+
         // More specific error messages
         let errorMessage = 'Error submitting your request. Please try again.';
         if (error.code === 'unavailable') {
@@ -133,7 +135,7 @@ window.submitJoinForm = async function(event) {
         } else if (error.code === 'permission-denied') {
             errorMessage = 'Permission denied. Please contact support.';
         }
-        
+
         showMessage(errorMessage, false);
     }
 };
@@ -144,12 +146,12 @@ function resetFormMessages() {
 }
 
 // Form interaction enhancements
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Add input event listeners for real-time validation feedback
     const inputs = document.querySelectorAll('.form-input');
-    
+
     inputs.forEach(input => {
-        input.addEventListener('input', function() {
+        input.addEventListener('input', function () {
             // Clear error state when user starts typing
             if (this.classList.contains('border-red-400')) {
                 this.classList.remove('border-red-400');
@@ -158,18 +160,18 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         // Add focus/blur animations
-        input.addEventListener('focus', function() {
+        input.addEventListener('focus', function () {
             this.parentElement.classList.add('focused');
         });
 
-        input.addEventListener('blur', function() {
+        input.addEventListener('blur', function () {
             this.parentElement.classList.remove('focused');
         });
     });
 
     // Form submission prevention for invalid states
     const form = document.getElementById('joinForm');
-    form.addEventListener('submit', function(e) {
+    form.addEventListener('submit', function (e) {
         const submitBtn = document.getElementById('submitBtn');
         if (submitBtn.disabled) {
             e.preventDefault();
@@ -178,14 +180,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Keyboard navigation improvements
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
             const form = document.getElementById('joinForm');
             const formData = new FormData(form);
             let allFilled = true;
-            
+
             // Check if all required fields are filled
-            const requiredFields = ['name', 'phone', 'email', 'location', 'leadSource', 'whyWantToJoin'];
+            const requiredFields = ['name', 'phone', 'email', 'age', 'location', 'leadSource', 'whyWantToJoin'];
             requiredFields.forEach(field => {
                 if (!document.getElementById(field).value.trim()) {
                     allFilled = false;
@@ -200,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Auto-resize textarea
     const textarea = document.getElementById('whyWantToJoin');
-    textarea.addEventListener('input', function() {
+    textarea.addEventListener('input', function () {
         this.style.height = 'auto';
         this.style.height = Math.min(this.scrollHeight, 200) + 'px';
     });
@@ -209,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const glassCard = document.querySelector('.glass-card');
     glassCard.style.opacity = '0';
     glassCard.style.transform = 'translateY(20px)';
-    
+
     setTimeout(() => {
         glassCard.style.transition = 'all 0.6s ease-out';
         glassCard.style.opacity = '1';
@@ -229,7 +231,7 @@ function highlightError(fieldId) {
 function showSuccessAnimation() {
     const submitBtn = document.getElementById('submitBtn');
     submitBtn.classList.add('animate-pulse');
-    
+
     setTimeout(() => {
         submitBtn.classList.remove('animate-pulse');
     }, 1000);
